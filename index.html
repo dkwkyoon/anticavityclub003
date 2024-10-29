@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="fav.png">
+
+	<title>충치 예방 클럽</title>
+ 		
+ 		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
+
+	<style type="text/css">
+		body, html {
+         margin: 0;
+         padding: 0;
+         height: 100%;
+         overflow: hidden;
+         }
+
+
+
+         h1{position: absolute;
+         	top:-20px; font-size: 2.6rem; color: black;
+         	 padding-left: 20px; z-index: 10;
+          font-family: "Dongle", sans-serif;
+          font-weight: 400;
+          font-style: normal;
+        }
+
+    	 #mouth {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background-image: url('back3.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .tooth {
+         position: absolute;
+         cursor: pointer;
+         transition: transform 0.2s, width 0.2s, height 0.2s;
+       	 }
+
+        .tooth:hover {
+            transform: scale(1.2);
+        }
+
+         #clubCardButton {
+            display: none; 
+            position: absolute;
+            top: 400px; 
+            left: 38%;
+            padding: 8px 35px 10px 40px;
+            color: salmon;
+            background-color: white;
+            border: 1.5px salmon solid;
+            border-radius: 15px;
+            cursor: pointer;
+            z-index: 10;
+            font-family: "Dongle", sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 2.5rem;
+        }
+
+        #clubCardButton:hover {
+            background-color: salmon; 
+            color: white;
+            font-family: "Dongle", sans-serif;
+          font-weight: 400;
+          border: 2px salmon solid;
+          font-style: normal;
+          cursor: url('gogo.png'), auto;
+        }
+
+         .bubble {
+            position: absolute;
+            background-color:rgba(255, 255, 255, 0.8);
+            color: black;
+            padding: 3px 10px 3px 10px;
+            border-radius: 30px;
+            border: 1.2px solid gray;
+            font-family: "Dongle", sans-serif;
+            font-weight: 400;
+            font-size: 1.3rem;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+            z-index: 20;
+
+        }
+
+
+	</style>
+</head>
+<body>
+	<body>
+      <div id="game">
+        <h1>남은 충치: <span id="remaining">7</span></h1>
+        <div id="mouth">  </div>
+        <button id="clubCardButton">클럽 회원증 발급 받으러 가기</button>
+    </div>
+
+
+      <script>
+        const totalTeeth = 7;
+        let remainingTeeth = totalTeeth;
+        const teeth = [];  
+        let removedCount = 0; 
+
+         const bubbleMessages = ["날 잡다니...", "살려 줘!", "으아아악", "잡지 마..", "양치 싫어!!"];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const mouth = document.getElementById("mouth");
+            const remainingDisplay = document.getElementById("remaining");
+            const clubCardButton = document.getElementById("clubCardButton");
+
+          
+            for (let i = 0; i < totalTeeth; i++) {
+                const tooth = document.createElement("img");
+                const toothImages = ["cc02.gif", "cc04.gif"];
+            tooth.src = toothImages[Math.floor(Math.random() * toothImages.length)];
+                tooth.classList.add("tooth");
+                tooth.dataset.clicks = 0;
+                mouth.appendChild(tooth);
+                teeth.push(tooth);
+
+              
+                randomizeTooth(tooth);
+
+
+                tooth.addEventListener("click", () => {
+                    let clicks = parseInt(tooth.dataset.clicks);
+                    clicks++;
+                    tooth.dataset.clicks = clicks;
+
+                    if (clicks < 2) {
+                        let currentSize = parseInt(tooth.style.width);
+                        let newSize = Math.max(20, currentSize * 0.8);  
+                        tooth.style.width = `${newSize}px`;
+                        tooth.style.height = `${newSize}px`;
+                    } else if (clicks === 2) {
+                         const bubble = tooth.querySelector(".bubble");
+                        if (bubble) {
+                            bubble.remove();
+                        }
+                        tooth.remove();  
+                        remainingTeeth--;
+                        remainingDisplay.textContent = remainingTeeth;
+                        removedCount++;
+
+                        if (remainingTeeth === 0) {
+                            clubCardButton.style.display = 'block';
+                        }
+
+                    
+                        if (removedCount % 2 === 0) {
+                            teeth.forEach(t => {
+                                if (document.body.contains(t)) {
+                                    randomizeTooth(t);  // 
+                                }
+                            });
+                        }
+ 
+                    }
+
+                      if (Math.random() < 0.9 && clicks < 2) {
+                        showBubble(tooth);
+                        }
+                });
+            }
+        });
+
+
+        function randomizeTooth(tooth) {
+            const mouth = document.getElementById("mouth");
+            const mouthWidth = mouth.offsetWidth;
+            const mouthHeight = mouth.offsetHeight;
+
+            const yRanges = [
+          	{ minY: 50, maxY: 150 },
+         	{ minY: 650, maxY: 760 }
+            ];
+
+            const randomX = Math.floor(Math.random() * (mouthWidth - 50));   
+            const selectedRange = yRanges[Math.floor(Math.random() * yRanges.length)];
+            const randomY = Math.floor(Math.random() * (selectedRange.maxY - selectedRange.minY)) + selectedRange.minY;
+            const randomSize = Math.floor(Math.random() * 30) + 50;  
+            const randomAngle = Math.floor(Math.random() * 360);
+
+            tooth.style.left = `${randomX}px`;
+            tooth.style.top = `${randomY}px`;
+            tooth.style.width = `${randomSize}px`;
+            tooth.style.height = `${randomSize}px`;
+            tooth.style.transform = `rotate(${randomAngle}deg)`;
+        }
+
+         function showBubble(tooth) {
+            const bubble = document.createElement("div");
+            bubble.className = "bubble";
+            bubble.textContent = bubbleMessages[Math.floor(Math.random() * bubbleMessages.length)];
+
+            const rect = tooth.getBoundingClientRect();
+            bubble.style.left = `${rect.left + window.scrollX + rect.width / 2+10}px`;
+            bubble.style.top = `${rect.top + window.scrollY - 15}px`;
+
+            document.body.appendChild(bubble);
+
+            setTimeout(() => {
+                bubble.remove();
+            }, 1000);
+        }
+
+       document.getElementById("clubCardButton").addEventListener("click", () => {
+            window.location.href = "https://dkwkyoon.github.io/anticavityclub004/";
+        });
+
+
+
+    </script>
+</body>
+</html>
